@@ -5,7 +5,23 @@
   const i18n = require('i18next');
   const sprintf = require('i18next-sprintf-postprocessor');
 
-  // core functionality for fact skill
+  const LaunchHandler = {
+    canHandle(handlerInput) {
+      const request = handlerInput.requestEnvelope.request
+      // checks request type
+      return request.type === 'LaunchRequest'
+    },
+    handle(handlerInput) {
+      const request = handlerInput.requestEnvelope.request
+      const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+      const welcomeMessage = requestAttributes.t('WELCOME_MESSAGE')
+
+      return handlerInput.responseBuilder
+        .speak(welcomeMessage)
+        .withSimpleCard(requestAttributes.t('SKILL_NAME'), welcomeMessage)
+        .getResponse();
+    }
+  }
   const AddDirectTaskHandler = {
     canHandle(handlerInput) {
       const request = handlerInput.requestEnvelope.request;
@@ -141,6 +157,7 @@
 
   exports.handler = skillBuilder
     .addRequestHandlers(
+      LaunchHandler,
       AddDirectTaskHandler,
       HelpHandler,
       ExitHandler,
@@ -154,25 +171,17 @@
   // translations
   const enData = {
     translation: {
-      SKILL_NAME: 'NirvanaHQ',
+      SKILL_NAME: 'NirvanaHQ (unofficial)',
       SUCCESS_MESSAGE: [
         "Great! I've added \"%s\" to your Nirvana inbox."
       ],
-      GET_FACT_MESSAGE: 'Here\'s your fact: ',
-      HELP_MESSAGE: 'You can say tell me a space fact, or, you can say exit... What can I help you with?',
-      HELP_REPROMPT: 'What can I help you with?',
-      FALLBACK_MESSAGE: 'The Space Facts skill can\'t help you with that.  It can help you discover facts about space if you say tell me a space fact. What can I help you with?',
+      WELCOME_MESSAGE: 'Welcome to Nirvana. You can say something like, "Add Book a reservation to my to-dos," and I’ll add it to your Nirvana inbox.',
+      HELP_MESSAGE: 'You can say "Add pickup dry-cleaning", or, "Add Call my bank to my to-do list."',
+      HELP_REPROMPT: 'What would you like to add to your to-do list?',
+      FALLBACK_MESSAGE: 'The Nirvana skill can\'t help you with that.  It can help you add a new to-do to your Nirvana HQ inbox if you say "Add Book my flights". What can I help you with?',
       FALLBACK_REPROMPT: 'What can I help you with?',
       ERROR_MESSAGE: 'Sorry, an error occurred.',
       STOP_MESSAGE: 'Goodbye!',
-      FACTS:
-        [
-          'A year on Mercury is just 88 days long.',
-          'Despite being farther from the Sun, Venus experiences higher temperatures than Mercury.',
-          'On Mars, the Sun appears about half the size as it does on Earth.',
-          'Jupiter has the shortest day of all the planets.',
-          'The Sun is an almost perfect sphere.',
-        ],
     },
   };
 
